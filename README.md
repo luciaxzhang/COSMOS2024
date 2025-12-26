@@ -36,7 +36,7 @@ Since there are 537 healthy subjects and only 81 myopic subjects, the dataset is
 
 ## 2. Data Exploration via Correlation Matrix
 
-We first explore the correlation between different pairs of variables, in particular, the correlation of `MYOPIC` to other variables in terms of Pearson's correlation coefficient.
+We first explore the correlation between pairs of variables, in particular the correlation between `MYOPIC` and other variables, using Pearson's correlation coefficient.
 
 ``` r
 # Load necessary libraries
@@ -85,8 +85,8 @@ correlation_matrix[3,]
 **Conclusion:**
 
 -   There are no missing values and all variables are coded in numeric values;
--   There is only one pair of variables, AL and VCD, which are correlated over with scale of correlation coefficient over 0.9. In fact their correlation coefficient is 0.94;
--   Whether the subject is myopic is slightly correlated with Gender (with Pearson's correlation coefficient $\rho=0.0616$), ACD ($\rho=0.1079$), SPORTHR ($\rho=-0.0983$), READHR ($\rho=0.0727$), MOMMY ($\rho=0.1340$), DADMY ($\rho=0.1499$) but rather strongly related to SPHEQ ($\rho=-0.3736$).
+- There is only one pair of variables, AL and VCD, which are correlated with a scale of correlation coefficient over 0.9. In fact, their correlation coefficient is 0.94;
+-   Whether the subject is myopic is slightly correlated with Gender (with Pearson's correlation coefficient $\rho=0.0616$), ACD ($\rho=0.1079$), SPORTHR ($\rho=-0.0983$), READHR ($\rho=0.0727$), MOMMY ($\rho=0.1340$), DADMY ($\rho=0.1499$), but instead strongly related to SPHEQ ($\rho=-0.3736$).
 
 ## 3. Hypothesis Tests on Association of Different Activity Times with Myopia
 
@@ -157,7 +157,7 @@ t_test_logres <- list(
 t_test_logres
 ```
 
-After the log-transformation, we observe much less number of outliers shown in the boxplots, although there are still some. We further consider Mann-Whitney U test, aka Wilcoxon Rank-Sum test, on the activity hours.
+After the log-transformation, we observe fewer outliers in the boxplots, although some remain. We further consider the Mann-Whitney U test, aka the Wilcoxon Rank-Sum test, on the activity hours.
 
 ``` r
 wilcox_test_results <- list(
@@ -172,7 +172,7 @@ wilcox_test_results <- list(
 wilcox_test_results
 ```
 
-As the hypothesis tests suggest possible association of `READHR` and `SPORTHR` with `MYOPIC`, we further explore the association with the plot.
+As the hypothesis tests suggest a possible association of `READHR` and `SPORTHR` with `MYOPIC`, we further explore the association with the plot.
 
 ``` r
 ggplot(hours,
@@ -182,14 +182,14 @@ ggplot(hours,
   geom_point()
 ```
 
-It seems that less `SPROTHR` and more `READHR` are associated with `MYOPIC`. So we resort to logistic regression include both `SPROTHR` and `READHR` in the model and study their association iwht `MYOPIC`.
+It seems that less `SPROTHR` and more `READHR` are associated with `MYOPIC`. So we resort to logistic regression, including both `SPROTHR` and `READHR` in the model and studying their association with `MYOPIC`.
 
 ``` r
 sportread.model <- glm(MYOPIC ~ SPORTHR+READHR, data = hours, family = binomial)
 summary(sportread.model) # SPORTHR: 0.00729; READHR: 0.02689 -- Both significant (alpha=0.05)
 ```
 
-Aware of possible confounding effects by age and gender, we apply the logistic regression to check the association of each activity time with `MYOPIC`.
+Aware of potential confounding effects by age and gender, we apply logistic regression to examine the association between each activity time and `MYOPIC`.
 
 ``` r
 sporthr.glm <- glm(MYOPIC ~ AGE*GENDER*SPORTHR, data = myopia, family = binomial)
@@ -215,14 +215,14 @@ summary(diopterhr.glm) # None significant
 
 -   Hours spent on different activities are right-skewed, implying that, for each activity, some subjects might overspend their time;
 -   After log-transformation, we observed significantly different times on sports between healthy and myopic subjects, which is also evident in Mann-Whitney U Test;
--   After log-transformation, we observed slightly significant (p-value=0.09062) difference of times on reading between healthy and myopic subjects, which is also evident in Mann-Whitney U Test (with p-value=0.102);
+-   After log-transformation, we observed a slightly significant (p-value=0.09062) difference in times on reading between healthy and myopic subjects, which is also evident in Mann-Whitney U Test (with p-value=0.102);
 -   Using the logistic regression model including both SPORTHR and READHR, both times are significantly associated with MYOPIC (with p-values at 0.00729 and 0.02689 respectively), with SPORTHR significantly decreasing the chance to have myopia and READHR significantly increasing the chance to have myopia;
--   The logistic regression model suggests that, every additional hour spent on sports, the log odds of MYOPIC decreases by 0.04747($\pm$ 0.01769) and every additional hour spent on reading, the log odds of MYOPIC increases by 0.08030 ($\pm$ 0.03629);
+-   The logistic regression model suggests that, every additional hour spent on sports, the log odds of MYOPIC decreases by 0.04747($\pm$ 0.01769), andfor  every extra hour spent on reading, the log odds of MYOPIC increase by 0.08030 ($\pm$ 0.03629);
 -   After controlling the possible confounding effects of age and gender, only `SPORTHR` is associated with 'MYOPIC\`, and the association IS confounded by age and gender.
 
 ## 4. Predicting Myopia
 
-Shown in above hypothesis tests, different variables may complicated relation to `MYOPIC`. Here we will apply different types of machine learning methods to build predictive models for `MYOPIC`, using all available models. As there are 6 subjects (4 healthy and 2 myopic subjects) with age at 9 year old, we will exclude them for the purpose of building more reliable models including age.
+As shown in the above hypothesis tests, different variables may have complex relationships with `MYOPIC`. Here, we will apply various machine learning methods to build predictive models for `MYOPIC` using all available models. As there are 6 subjects (4 healthy and 2 myopic subjects) with age at 9 year old, we will exclude them for the purpose of building more reliable models including age.
 
 ### 4.1 Predicting Myopia Using Random Forests
 
@@ -860,4 +860,4 @@ SVM also reports AUC at 0.82.
 
 -   We only explored the top three features reported by XGBoost, but their predictive power is much lower than that of all features.
 
--   There are some myopic cases which are difficult to separate from healthy subjects. We may carry this data to study more on challenges in analyzing unbalanced data.
+-   There are some myopic cases that are difficult to separate from healthy subjects. We may use this data to study challenges in analyzing unbalanced data further.
